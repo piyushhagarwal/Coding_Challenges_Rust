@@ -87,3 +87,29 @@ fn main() {
     }
 
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_count_bytes() {
+        assert_eq!(count_bytes("Hello, world!"), 13);
+        assert_eq!(count_bytes(""), 0);
+        assert_eq!(count_bytes("12345"), 5);
+    }
+
+    #[test]
+    fn test_count_words() {
+        assert_eq!(count_words("Hello, world!"), 2);
+        assert_eq!(count_words(""), 0);
+        assert_eq!(count_words("This is a test."), 4);
+    }
+
+    #[test]
+    fn test_count_lines() {
+        assert_eq!(count_lines("Hello\nworld"), 2);
+        assert_eq!(count_lines(""), 0);
+        assert_eq!(count_lines("Line 1\nLine 2\nLine 3"), 3);
+    }
+}
