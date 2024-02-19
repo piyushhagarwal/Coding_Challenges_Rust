@@ -106,7 +106,7 @@ pub fn lexer(json: &str) -> Vec<Token> {
             panic!("Invalid argument passed to the lexer function. {} .", json.chars().nth(current_pointer).expect("Index out of bound"));
         }
     }
-    tokens
+    tokens // Return the tokens vector
 }
 
 
@@ -126,6 +126,8 @@ mod tests {
             "hobbies": [],
             "isMarried": false
         }"#;
+
+        
         let tokens = lexer(json);
         assert_eq!(tokens.len(), 22);
         assert_eq!(tokens[0].token, TokenType::OpenBrace);
@@ -152,3 +154,26 @@ mod tests {
         assert_eq!(tokens[21].token, TokenType::CloseBrace);
     }
 }
+
+//     OpenBrace : {
+//     String : name
+//     Colon : :
+//     String : John
+//     Comma : ,
+//     String : age
+//     Colon : :
+//     Number : 30
+//     Comma : ,
+//     String : car
+//     Colon : :
+//     Null : null
+//     Comma : ,
+//     String : hobbies
+//     Colon : :
+//     OpenBracket : [
+//     CloseBracket : ]
+//     Comma : ,
+//     String : isMarried
+//     Colon : :
+//     False : false
+//     CloseBrace : }
