@@ -16,7 +16,7 @@ pub enum TokenType {
 }
 
 pub struct Token{
-    pub token: TokenType,
+    pub token_type: TokenType,
     pub value: String,
 }
 
@@ -26,27 +26,27 @@ pub fn lexer(json: &str) -> Vec<Token> {
 
     while current_pointer < json.len() {
         if json.chars().nth(current_pointer) == Some('{') {
-            tokens.push(Token{token: TokenType::OpenBrace, value: String::from("{")});
+            tokens.push(Token{token_type: TokenType::OpenBrace, value: String::from("{")});
             current_pointer += 1;
         }
         else if json.chars().nth(current_pointer) == Some('}') {
-            tokens.push(Token{token: TokenType::CloseBrace, value: String::from("}")});
+            tokens.push(Token{token_type: TokenType::CloseBrace, value: String::from("}")});
             current_pointer += 1;
         }
         else if json.chars().nth(current_pointer) == Some('[') {
-            tokens.push(Token{token: TokenType::OpenBracket, value: String::from("[")});
+            tokens.push(Token{token_type: TokenType::OpenBracket, value: String::from("[")});
             current_pointer += 1;
         }
         else if json.chars().nth(current_pointer) == Some(']') {
-            tokens.push(Token{token: TokenType::CloseBracket, value: String::from("]")});
+            tokens.push(Token{token_type: TokenType::CloseBracket, value: String::from("]")});
             current_pointer += 1;
         }
         else if json.chars().nth(current_pointer) == Some(':') {
-            tokens.push(Token{token: TokenType::Colon, value: String::from(":")});
+            tokens.push(Token{token_type: TokenType::Colon, value: String::from(":")});
             current_pointer += 1;
         }
         else if json.chars().nth(current_pointer) == Some(',') {
-            tokens.push(Token{token: TokenType::Comma, value: String::from(",")});
+            tokens.push(Token{token_type: TokenType::Comma, value: String::from(",")});
             current_pointer += 1;
         }
         else if json.chars().nth(current_pointer).expect("Index out of bound").is_numeric() {
@@ -56,7 +56,7 @@ pub fn lexer(json: &str) -> Vec<Token> {
                 value.push(json.chars().nth(i).expect("Index out of bound"));
                 i += 1;
             }
-            tokens.push(Token{token: TokenType::Number, value});
+            tokens.push(Token{token_type: TokenType::Number, value});
             current_pointer = i;
         }
         else if json.chars().nth(current_pointer) == Some('t') {
@@ -66,7 +66,7 @@ pub fn lexer(json: &str) -> Vec<Token> {
                 i += 4;
                 value = String::from("true");
             }
-            tokens.push(Token{token: TokenType::True, value});
+            tokens.push(Token{token_type: TokenType::True, value});
             current_pointer = i;
         }
         else if json.chars().nth(current_pointer) == Some('f') {
@@ -76,7 +76,7 @@ pub fn lexer(json: &str) -> Vec<Token> {
                 i += 5;
                 value = String::from("false");
             }
-            tokens.push(Token{token: TokenType::False, value});
+            tokens.push(Token{token_type: TokenType::False, value});
             current_pointer = i;
         }
         else if json.chars().nth(current_pointer) == Some('n') {
@@ -86,7 +86,7 @@ pub fn lexer(json: &str) -> Vec<Token> {
                 i += 4;
                 value = String::from("null");
             }
-            tokens.push(Token{token: TokenType::Null, value});
+            tokens.push(Token{token_type: TokenType::Null, value});
             current_pointer = i;
         }
         else if json.chars().nth(current_pointer) == Some('"') {
@@ -96,7 +96,7 @@ pub fn lexer(json: &str) -> Vec<Token> {
                 value.push(json.chars().nth(i).expect("Index out of bound"));
                 i += 1;
             }
-            tokens.push(Token{token: TokenType::String, value});
+            tokens.push(Token{token_type: TokenType::String, value});
             current_pointer = i + 1;
         }
         else if json.chars().nth(current_pointer) == Some(' ') || json.chars().nth(current_pointer) == Some('\n') || json.chars().nth(current_pointer) == Some('\t'){
@@ -130,28 +130,28 @@ mod tests {
         
         let tokens = lexer(json);
         assert_eq!(tokens.len(), 22);
-        assert_eq!(tokens[0].token, TokenType::OpenBrace);
-        assert_eq!(tokens[1].token, TokenType::String);
-        assert_eq!(tokens[2].token, TokenType::Colon);
-        assert_eq!(tokens[3].token, TokenType::String);
-        assert_eq!(tokens[4].token, TokenType::Comma);
-        assert_eq!(tokens[5].token, TokenType::String);
-        assert_eq!(tokens[6].token, TokenType::Colon);
-        assert_eq!(tokens[7].token, TokenType::Number);
-        assert_eq!(tokens[8].token, TokenType::Comma);
-        assert_eq!(tokens[9].token, TokenType::String);
-        assert_eq!(tokens[10].token, TokenType::Colon);
-        assert_eq!(tokens[11].token, TokenType::Null);
-        assert_eq!(tokens[12].token, TokenType::Comma);
-        assert_eq!(tokens[13].token, TokenType::String);
-        assert_eq!(tokens[14].token, TokenType::Colon);
-        assert_eq!(tokens[15].token, TokenType::OpenBracket);
-        assert_eq!(tokens[16].token, TokenType::CloseBracket);
-        assert_eq!(tokens[17].token, TokenType::Comma);
-        assert_eq!(tokens[18].token, TokenType::String);
-        assert_eq!(tokens[19].token, TokenType::Colon);
-        assert_eq!(tokens[20].token, TokenType::False);
-        assert_eq!(tokens[21].token, TokenType::CloseBrace);
+        assert_eq!(tokens[0].token_type, TokenType::OpenBrace);
+        assert_eq!(tokens[1].token_type, TokenType::String);
+        assert_eq!(tokens[2].token_type, TokenType::Colon);
+        assert_eq!(tokens[3].token_type, TokenType::String);
+        assert_eq!(tokens[4].token_type, TokenType::Comma);
+        assert_eq!(tokens[5].token_type, TokenType::String);
+        assert_eq!(tokens[6].token_type, TokenType::Colon);
+        assert_eq!(tokens[7].token_type, TokenType::Number);
+        assert_eq!(tokens[8].token_type, TokenType::Comma);
+        assert_eq!(tokens[9].token_type, TokenType::String);
+        assert_eq!(tokens[10].token_type, TokenType::Colon);
+        assert_eq!(tokens[11].token_type, TokenType::Null);
+        assert_eq!(tokens[12].token_type, TokenType::Comma);
+        assert_eq!(tokens[13].token_type, TokenType::String);
+        assert_eq!(tokens[14].token_type, TokenType::Colon);
+        assert_eq!(tokens[15].token_type, TokenType::OpenBracket);
+        assert_eq!(tokens[16].token_type, TokenType::CloseBracket);
+        assert_eq!(tokens[17].token_type, TokenType::Comma);
+        assert_eq!(tokens[18].token_type, TokenType::String);
+        assert_eq!(tokens[19].token_type, TokenType::Colon);
+        assert_eq!(tokens[20].token_type, TokenType::False);
+        assert_eq!(tokens[21].token_type, TokenType::CloseBrace);
     }
 }
 

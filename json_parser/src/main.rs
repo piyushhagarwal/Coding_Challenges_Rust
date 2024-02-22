@@ -1,7 +1,10 @@
 mod lexer;
+mod parser;
 use lexer::lexer;
+use parser::parse;
 fn main() {
-    let json = r#"
+    let json1 = "{";
+    let json2 = r#"
     {
         "name": "John",
         "age": 30,
@@ -9,11 +12,13 @@ fn main() {
         "hobbies": [],
         "isMarried": false
     }"#;
-    let tokens = lexer(json);
+    let tokens = lexer(json1);
+    let rusult = parse(&tokens);
 
     // Print the tokens
     for token in &tokens {
-        println!("{:?} : {}", token.token, token.value);
+        println!("{:?} : {}", token.token_type, token.value);
+        println!("Result: {}", rusult);
     }
 }
 
