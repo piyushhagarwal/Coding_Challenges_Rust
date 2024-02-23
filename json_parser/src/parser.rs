@@ -6,6 +6,7 @@ use crate::lexer::TokenType;
 
 // Function to parse the tokens vector and check if the JSON is valid
 pub fn parse(tokens: &Vec<Token>) -> bool {
+    // Check if the tokens vector is empty
     if tokens.len() == 0 {
         // If the JSON is empty, return false
         return false;
@@ -13,10 +14,13 @@ pub fn parse(tokens: &Vec<Token>) -> bool {
 
     let mut current_pointer = 0;
 
+    // Call the recursive parse_value function to start parsing the JSON
     let result = parse_value(&tokens, &mut current_pointer);
     
+    // Return true if parsing is successful and the entire tokens vector is consumed
     result && current_pointer == tokens.len()
 }
+
 
 // Function to parse individual values or in our case individual tokens
 pub fn parse_value(tokens : &Vec<Token>, current_pointer : &mut usize) -> bool{

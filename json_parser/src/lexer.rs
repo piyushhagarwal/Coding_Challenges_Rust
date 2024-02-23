@@ -2,17 +2,20 @@
 
 #[derive(Debug, PartialEq)] //Debug trait is used to print the enum and PartialEq is used to compare the enum
 pub enum TokenType {
-    OpenBrace,
-    CloseBrace,
-    OpenBracket, // [ for array
-    CloseBracket,
-    Colon,
-    Comma,
-    String,
-    Number,
-    True,
-    False,
-    Null,
+    // Structural Tokens
+    OpenBrace,      // {
+    CloseBrace,     // }
+    OpenBracket,    // [
+    CloseBracket,   // ]
+    Colon,          // :
+    Comma,          // ,
+    
+    // Value Tokens
+    String,         // "string"
+    Number,         // 123 or 12.34
+    True,           // true
+    False,          // false
+    Null,           // null
 }
 
 pub struct Token{
@@ -24,34 +27,43 @@ pub fn lexer(json: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut current_pointer = 0;
 
+    // Loop through the input JSON string
     while current_pointer < json.len() {
+        // Check for opening curly brace '{'
         if json.chars().nth(current_pointer) == Some('{') {
             tokens.push(Token{token_type: TokenType::OpenBrace, value: String::from("{")});
             current_pointer += 1;
         }
+        // Check for closing curly brace '}'
         else if json.chars().nth(current_pointer) == Some('}') {
             tokens.push(Token{token_type: TokenType::CloseBrace, value: String::from("}")});
             current_pointer += 1;
         }
+        // Check for opening square bracket '['
         else if json.chars().nth(current_pointer) == Some('[') {
             tokens.push(Token{token_type: TokenType::OpenBracket, value: String::from("[")});
             current_pointer += 1;
         }
+        // Check for closing square bracket ']'
         else if json.chars().nth(current_pointer) == Some(']') {
             tokens.push(Token{token_type: TokenType::CloseBracket, value: String::from("]")});
             current_pointer += 1;
         }
+        // Check for colon ':'
         else if json.chars().nth(current_pointer) == Some(':') {
             tokens.push(Token{token_type: TokenType::Colon, value: String::from(":")});
             current_pointer += 1;
         }
+        // Check for comma ','
         else if json.chars().nth(current_pointer) == Some(',') {
             tokens.push(Token{token_type: TokenType::Comma, value: String::from(",")});
             current_pointer += 1;
         }
+        // Check for numeric values
         else if json.chars().nth(current_pointer).expect("Index out of bound").is_numeric() {
             let mut value = String::new();
             let mut i = current_pointer;
+            // Collect numeric characters
             while json.chars().nth(i).expect("Index out of bound").is_numeric() {
                 value.push(json.chars().nth(i).expect("Index out of bound"));
                 i += 1;
@@ -59,9 +71,11 @@ pub fn lexer(json: &str) -> Vec<Token> {
             tokens.push(Token{token_type: TokenType::Number, value});
             current_pointer = i;
         }
+        // Check for the keyword 'true'
         else if json.chars().nth(current_pointer) == Some('t') {
             let mut value = String::new();
             let mut i = current_pointer;
+            // Verify 'true' and update index
             if json.chars().nth(i) == Some('t') && json.chars().nth(i+1) == Some('r') && json.chars().nth(i+2) == Some('u') && json.chars().nth(i+3) == Some('e')  {
                 i += 4;
                 value = String::from("true");
@@ -69,9 +83,11 @@ pub fn lexer(json: &str) -> Vec<Token> {
             tokens.push(Token{token_type: TokenType::True, value});
             current_pointer = i;
         }
+        // Check for the keyword 'false'
         else if json.chars().nth(current_pointer) == Some('f') {
             let mut value = String::new();
             let mut i = current_pointer;
+            // Verify 'false' and update index
             if json.chars().nth(i) == Some('f') && json.chars().nth(i+1) == Some('a') && json.chars().nth(i+2) == Some('l') && json.chars().nth(i+3) == Some('s') && json.chars().nth(i+4) == Some('e') {
                 i += 5;
                 value = String::from("false");
@@ -79,9 +95,11 @@ pub fn lexer(json: &str) -> Vec<Token> {
             tokens.push(Token{token_type: TokenType::False, value});
             current_pointer = i;
         }
+        // Check for the keyword 'null'
         else if json.chars().nth(current_pointer) == Some('n') {
             let mut value = String::new();
             let mut i = current_pointer;
+            // Verify 'null' and update index
             if json.chars().nth(i) == Some('n') && json.chars().nth(i+1) == Some('u') && json.chars().nth(i+2) == Some('l') && json.chars().nth(i+3) == Some('l')  {
                 i += 4;
                 value = String::from("null");
@@ -89,9 +107,11 @@ pub fn lexer(json: &str) -> Vec<Token> {
             tokens.push(Token{token_type: TokenType::Null, value});
             current_pointer = i;
         }
+        // Check for double quotes indicating the start of a string
         else if json.chars().nth(current_pointer) == Some('"') {
             let mut value = String::new();
             let mut i = current_pointer + 1;
+            // Collect characters until the closing double quote
             while json.chars().nth(i) != Some('"') {
                 value.push(json.chars().nth(i).expect("Index out of bound"));
                 i += 1;
@@ -99,16 +119,18 @@ pub fn lexer(json: &str) -> Vec<Token> {
             tokens.push(Token{token_type: TokenType::String, value});
             current_pointer = i + 1;
         }
+        // Ignore whitespace characters
         else if json.chars().nth(current_pointer) == Some(' ') || json.chars().nth(current_pointer) == Some('\n') || json.chars().nth(current_pointer) == Some('\t'){
             current_pointer += 1;
         }
+        // If the character is not a valid JSON token, return an empty vector
         else {
-            // If the character is not a valid JSON token return empty vector
             return Vec::new();
         }
     }
     tokens // Return the tokens vector
 }
+
 
 
 // Test cases for the lexer function
