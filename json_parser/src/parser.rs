@@ -62,9 +62,14 @@ pub fn parse_object(tokens : &Vec<Token>, current_pointer : &mut usize) -> bool{
         }
 
         *current_pointer += 1; // Skip the value
+        
+        // If the next token is a comma and after the comma there is closing brace, return false (e.g. {"key": "value",})
+        if *current_pointer < tokens.len() && tokens[*current_pointer].token_type == TokenType::Comma && tokens[*current_pointer + 1].token_type == TokenType::CloseBrace{
+            return false;
+        }
 
         // If the next token is a comma, skip it
-        if tokens[*current_pointer].token_type == TokenType::Comma{
+        if *current_pointer < tokens.len() && tokens[*current_pointer].token_type == TokenType::Comma{
             *current_pointer += 1; // Skip the comma
         }
     }
@@ -87,9 +92,14 @@ pub fn parse_array(tokens : &Vec<Token>, current_pointer : &mut usize) -> bool{
         }
 
         *current_pointer += 1; // Skip the value
+        
+        // If the next token is a comma and after the comma there is closing bracket, return false (e.g. ["value",])
+        if *current_pointer < tokens.len() && tokens[*current_pointer].token_type == TokenType::Comma && tokens[*current_pointer + 1].token_type == TokenType::CloseBracket{
+            return false;
+        }
 
         // If the next token is a comma, skip it
-        if tokens[*current_pointer].token_type == TokenType::Comma{
+        if *current_pointer < tokens.len() && tokens[*current_pointer].token_type == TokenType::Comma{
             *current_pointer += 1; // Skip the comma
         }
     }
@@ -98,7 +108,10 @@ pub fn parse_array(tokens : &Vec<Token>, current_pointer : &mut usize) -> bool{
         return false; // If the array is not closed
     }
 
-    *current_pointer += 1; // Skip the closing bracket
+    // If the json consists only array
+    if *current_pointer == &tokens.len() - 1 {
+        *current_pointer += 1;
+    }
 
     true // If the array is valid
 }

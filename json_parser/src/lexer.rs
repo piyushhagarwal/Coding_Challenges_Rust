@@ -103,7 +103,8 @@ pub fn lexer(json: &str) -> Vec<Token> {
             current_pointer += 1;
         }
         else {
-            panic!("Invalid argument passed to the lexer function. {} .", json.chars().nth(current_pointer).expect("Index out of bound"));
+            // If the character is not a valid JSON token return empty vector
+            return Vec::new();
         }
     }
     tokens // Return the tokens vector
