@@ -2,7 +2,7 @@ use std::fs::File; // Module to work with files
 use std::io::Read; // Module to read from files
 use std::collections::HashMap; // Module to work with hashmaps
 
-fn generate_frequency_table(file_name : &str) -> HashMap<char, i32>{
+pub fn generate_frequency_table(file_name : &str) -> HashMap<char, i32>{
     // Open the file
     let mut file = File::open(file_name).expect("Problem opening the file");
 
@@ -41,5 +41,6 @@ mod tests {
         let frequency_map = generate_frequency_table(file_name);
         assert_eq!(frequency_map.get(&'X'), Some(&333));
         assert_eq!(frequency_map.get(&'t'), Some(&223000));
+        assert_eq!(frequency_map.get(&'\0'), None);
     }
 }
