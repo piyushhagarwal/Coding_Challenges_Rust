@@ -1,10 +1,10 @@
 use std::collections::{BinaryHeap, HashMap};
 
 pub struct Node {
-    character: char,
-    frequency: i32,
-    left_child: Option<Box<Node>>,
-    right_child: Option<Box<Node>>
+    pub character: char,
+    pub frequency: i32,
+    pub left_child: Option<Box<Node>>,
+    pub right_child: Option<Box<Node>>
 }
 
 impl Node {
