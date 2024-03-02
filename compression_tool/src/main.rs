@@ -1,4 +1,4 @@
-use compression_tool::{generate_huffman_tree, generate_frequency_table, generate_prefix_table};
+use compression_tool::{generate_huffman_tree, generate_frequency_table, generate_prefix_table, encode_file, decode_file};
 
 fn main() {
     let file_name = "test_file.txt";
@@ -6,8 +6,7 @@ fn main() {
     let root = generate_huffman_tree(&frequency_table);
     let prefix_table = generate_prefix_table(root);
 
-    // Print prefix table
-    for (character, prefix) in prefix_table.iter() {
-        println!("{}: {}", character, prefix);
-    }
+    encode_file(file_name, "encoded_file.bin", &prefix_table);
+    decode_file("encoded_file.bin", "decoded_file.txt").unwrap();
+    
 }
