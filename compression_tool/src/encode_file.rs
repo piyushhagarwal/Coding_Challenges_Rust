@@ -34,7 +34,7 @@ fn serialize_huffman_binary_tree(huffman_binary_tree: Option<Box<Node>>) -> Stri
     result
 }
 
-fn write_header_to_file(huffman_binary_tree: Box<Node>, output_file_name: &str){
+fn write_header_to_file(huffman_binary_tree: Box<Node>, output_header_file:&str){
     // Serialize the huffman_binary_tree to a string    
     let serialized_huffman_binary_tree = serialize_huffman_binary_tree(Some(huffman_binary_tree));
 
@@ -43,18 +43,14 @@ fn write_header_to_file(huffman_binary_tree: Box<Node>, output_file_name: &str){
         .write(true)
         .append(true)  // Set append mode
         .create(true)
-        .open(output_file_name)
+        .open(output_header_file)
         .expect("Error opening the file");
 
     // Write the serialized huffman_binary_tree to the output file
     file.write_all(serialized_huffman_binary_tree.as_bytes()).expect("Error writing to file");
-
-    // Write a newline character to the output file
-    file.write_all(b"\n").expect("Error writing to file");
-
 }
 
-pub fn encode_file(input_file: &str, output_file: &str, huffman_binary_tree: Box<Node>, prefix_table: &HashMap<char, String>) {
+pub fn encode_file(input_file: &str, output_header_file:&str, output_file: &str, huffman_binary_tree: Box<Node>, prefix_table: &HashMap<char, String>) {
     // Read the input file
     let mut file = File::open(input_file).expect("Error opening the file");
     let mut text = String::new();
@@ -103,7 +99,7 @@ pub fn encode_file(input_file: &str, output_file: &str, huffman_binary_tree: Box
         .open(output_file)
         .expect("Error opening the file");
 
-    write_header_to_file(huffman_binary_tree, output_file);
+    write_header_to_file(huffman_binary_tree, output_header_file);
 
     file.write_all(&bytes).expect("Error writing to file");
 }
