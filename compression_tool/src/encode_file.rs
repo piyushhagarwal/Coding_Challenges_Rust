@@ -2,19 +2,58 @@
 
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
+use crate::huffman_binary_tree::{Node};
 
-fn write_header_to_file(prefix_table: &HashMap<char, String>, output_file_name: &str){
-    let mut file = File::create(output_file_name).expect("Error creating file");
-    file.write_all(b"PREFIX TABLE:\n").expect("Error writing to file");
-    for (key, value) in prefix_table {
-        write!(file, "{}:{}\n", key, value).expect("Error writing to file");
+fn serialize_huffman_binary_tree(huffman_binary_tree: Option<Box<Node>>) -> String {
+
+    let mut result = String::new();
+    // Create queue to store the nodes of the huffman_binary_tree
+    let mut queue = VecDeque::new();
+    queue.push_back(huffman_binary_tree);
+    
+    while !queue.is_empty() {
+        let node = queue.pop_front().unwrap();
+        match node {
+            Some(node) => {
+                result.push_str(&node.character.to_string());
+                result.push_str(" ");
+                queue.push_back(node.left_child);
+                queue.push_back(node.right_child);
+            },
+            None => {
+                result.push_str("null ");
+            }
+        }
     }
-    file.write_all(b"PREFIX TABLE END\n").expect("Error writing to file");
+    
+    result
 }
 
-pub fn encode_file(input_file: &str, output_file: &str, prefix_table: &HashMap<char, String>) {
+fn write_header_to_file(huffman_binary_tree: Box<Node>, output_file_name: &str){
+    // Serialize the huffman_binary_tree to a string    
+    let mut serialized_huffman_binary_tree = String::new();
+
+    // Serialize the huffman_binary_tree
+    serialized_huffman_binary_tree = serialize_huffman_binary_tree(Some(huffman_binary_tree));
+
+    // Open the output file in append mode
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)  // Set append mode
+        .create(true)
+        .open(output_file_name)
+        .expect("Error opening the file");
+
+    // Write the serialized huffman_binary_tree to the output file
+    file.write_all(serialized_huffman_binary_tree.as_bytes()).expect("Error writing to file");
+
+    // Write a newline character to the output file
+    file.write_all(b"\n").expect("Error writing to file");
+}
+
+pub fn encode_file(input_file: &str, output_file: &str, huffman_binary_tree: Box<Node>, prefix_table: &HashMap<char, String>) {
     // Read the input file
     let mut file = File::open(input_file).expect("Error opening the file");
     let mut text = String::new();
@@ -63,43 +102,9 @@ pub fn encode_file(input_file: &str, output_file: &str, prefix_table: &HashMap<c
         .open(output_file)
         .expect("Error opening the file");
 
-    write_header_to_file(prefix_table, output_file);
+    write_header_to_file(huffman_binary_tree, output_file);
+
     file.write_all(&bytes).expect("Error writing to file");
 }
 
 
-// Unit tests
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use std::fs;
-
-//     #[test]
-//     fn test_encode_file() {
-//         let input_file = "input.txt";
-//         let output_file = "output.txt";
-//         let prefix_table = [('a', "0".to_string()), ('b', "10".to_string()), ('c', "110".to_string()), ('d', "111".to_string())];
-//         encode_file(input_file, output_file, &prefix_table);
-
-//         let expected_output = "0101101110";
-//         let output = fs::read_to_string(output_file).expect("Error reading the file");
-//         assert_eq!(output, expected_output);
-//     }
-// }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_write_header_to_file() {
-        let mut prefix_table = HashMap::new();
-        prefix_table.insert('a', "0".to_string());
-        prefix_table.insert('b', "10".to_string());
-        prefix_table.insert('c', "110".to_string());
-        prefix_table.insert('d', "111".to_string());
-
-        write_header_to_file(&prefix_table, "test_prefix_table.txt");
-    }
-}

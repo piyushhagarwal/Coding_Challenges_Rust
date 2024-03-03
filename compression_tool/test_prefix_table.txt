@@ -1,6 +1,0 @@
-PREFIX TABLE:
-d: 111
-c: 110
-b: 10
-a: 0
-
