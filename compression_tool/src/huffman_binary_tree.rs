@@ -8,7 +8,7 @@ pub struct Node {
 }
 
 impl Node {
-    fn new_leaf(character: char, frequency: i32) -> Node {
+    pub fn new_leaf(character: char, frequency: i32) -> Node {
         Node {
             character,
             frequency,
@@ -17,7 +17,7 @@ impl Node {
         }
     }
 
-    fn new_internal(frequency: i32, left_child: Box<Node>, right_child: Box<Node>) -> Node {
+    pub fn new_internal(frequency: i32, left_child: Box<Node>, right_child: Box<Node>) -> Node {
         Node {
             character: '\0',
             frequency,

@@ -4,7 +4,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::collections::{HashMap, VecDeque};
 
-use crate::huffman_binary_tree::{Node};
+use crate::huffman_binary_tree::Node;
 
 fn serialize_huffman_binary_tree(huffman_binary_tree: Option<Box<Node>>) -> String {
 
@@ -27,16 +27,16 @@ fn serialize_huffman_binary_tree(huffman_binary_tree: Option<Box<Node>>) -> Stri
             }
         }
     }
+
+    // Remove the last space character
+    result.pop();
     
     result
 }
 
 fn write_header_to_file(huffman_binary_tree: Box<Node>, output_file_name: &str){
     // Serialize the huffman_binary_tree to a string    
-    let mut serialized_huffman_binary_tree = String::new();
-
-    // Serialize the huffman_binary_tree
-    serialized_huffman_binary_tree = serialize_huffman_binary_tree(Some(huffman_binary_tree));
+    let serialized_huffman_binary_tree = serialize_huffman_binary_tree(Some(huffman_binary_tree));
 
     // Open the output file in append mode
     let mut file = OpenOptions::new()
@@ -51,6 +51,7 @@ fn write_header_to_file(huffman_binary_tree: Box<Node>, output_file_name: &str){
 
     // Write a newline character to the output file
     file.write_all(b"\n").expect("Error writing to file");
+
 }
 
 pub fn encode_file(input_file: &str, output_file: &str, huffman_binary_tree: Box<Node>, prefix_table: &HashMap<char, String>) {
@@ -91,7 +92,7 @@ pub fn encode_file(input_file: &str, output_file: &str, huffman_binary_tree: Box
     }
 
     // Write the bytes to a text file (with .bin extension)
-    let mut file = File::create(output_file).expect("Error creating file");
+    File::create(output_file).expect("Error creating file");
 
     // Write the encoded text to the output file
     // Open the output file in append mode

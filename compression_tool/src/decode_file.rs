@@ -1,92 +1,71 @@
-use std::io::{self, Read, Write, BufRead, BufReader};
-use std::collections::HashMap;
-use std::fs::File;
+use std::{char, collections::VecDeque};
 
-// Function to read the header from the file and construct the prefix table
-fn read_header_from_file(input_file: &str) -> io::Result<HashMap<String, char>> {
-    let file = File::open(input_file)?;
-    let reader = BufReader::new(file);
-
-    // Parse the header to construct the prefix table
-    let mut prefix_table = HashMap::new();
-    let mut lines = reader.lines();
-    while let Some(Ok(line)) = lines.next() {
-        if line == "PREFIX TABLE END" {
-            break;
-        }
-
-        if line == "PREFIX TABLE:" {
-            continue;
-        }
-
-        let parts: Vec<&str> = line.split(':').collect();
-        if parts.len() == 2 {
-            let key = parts[0].chars().next().unwrap_or_else(|| {
-                eprintln!("Error parsing key in line: {}", line);
-                panic!("Unexpected header key format");
-            });
-            let value = parts[1].to_string();
-            prefix_table.insert(value, key);
-        } else {
-            eprintln!("Error parsing header line: {}", line);
-            panic!("Unexpected header format");
-        }
-    }
-
-    Ok(prefix_table)
+struct Node {
+    character: char,
+    left_child: Option<Box<Node>>,
+    right_child: Option<Box<Node>>
 }
 
-// Function to decode the file using the provided prefix table
-pub fn decode_file(input_file: &str, output_file: &str) -> io::Result<()> {
-    // Read the header to reconstruct the prefix table
-    let prefix_table = read_header_from_file(input_file)?;
-
-    // Print the reconstructed prefix table
-    println!("Reconstructed Prefix Table:");
-    for (key, value) in &prefix_table {
-        println!("{}: {}", key, value);
-    }
-
-    // Open the input file
-    let file = File::open(input_file)?;
-    let mut reader = BufReader::new(file);
-
-    // Skip the header
-    let mut line = String::new();
-    loop {
-        reader.read_line(&mut line)?;
-        if line == "PREFIX TABLE END\n" {
-            break;
-        }
-        line.clear();
-    }
-
-    // Read the encoded binary data
-    let mut encoded_data = Vec::new();
-    reader.read_to_end(&mut encoded_data)?;
-
-    // print the encoded data
-    println!("Encoded Data: {:?}", encoded_data);
-
-    // Decode the binary data using the prefix table
-    let mut decoded_text = String::new();
-    let mut current_code = String::new();
-
-    for byte in encoded_data.iter() {
-        for i in (0..8).rev() {
-            let bit = (byte >> i) & 1;
-            current_code.push_str(&bit.to_string());
-
-            if let Some(&character) = prefix_table.get(&current_code) {
-                decoded_text.push(character);
-                current_code.clear();
-            }
+impl Node {
+    fn new(character: char) -> Node {
+        Node {
+            character,
+            left_child: None,
+            right_child: None
         }
     }
+}
 
-    // Write the decoded text to the output file
-    let mut output_file = File::create(output_file)?;
-    output_file.write_all(decoded_text.as_bytes())?;
+fn deserialize_huffman_binary_tree(serialized_huffman_binary_tree: &str) -> Option<Box<Node>> {
+    let nodes: Vec<&str> = serialized_huffman_binary_tree.split(" ").collect();
+    
+    if nodes.is_empty() {
+        return None;
+    }
 
-    Ok(())
+    let mut queue = VecDeque::new();
+
+    let mut root = Box::new(Node::new('\0'));
+    queue.push_back(&mut root);
+    let mut i = 0;
+    while !queue.is_empty() {
+        let node = queue.pop_front().unwrap();
+        if i + 1 < nodes.len() && nodes[i + 1] != "null" {
+            let char = if nodes[i + 1].is_empty() {
+                '\0'
+            } else {
+                nodes[i + 1].chars().next().unwrap()
+            };
+            let left_child = Box::new(Node::new(char));
+            node.left_child = Some(left_child);
+            queue.push_back(node.left_child.as_mut().unwrap());
+        }
+        i += 1;
+        if i + 1 < nodes.len() && nodes[i + 1] != "null" {
+            let char = if nodes[i + 1].is_empty() {
+                '\0'
+            } else {
+                nodes[i + 1].chars().next().unwrap()
+            };
+            let right_child = Box::new(Node::new(char));
+            node.right_child = Some(right_child);
+            queue.push_back(node.right_child.as_mut().unwrap());
+        }
+        i += 1;
+    }
+
+    Some(root)
+}
+
+// Unit tests
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_deserialize_huffman_binary_tree() {
+        let serialized_huffman_binary_tree = " e  null null   u l d  null null null null null null c  null null  m z k null null null null null null";
+        let root = deserialize_huffman_binary_tree (serialized_huffman_binary_tree);
+    }
 }
