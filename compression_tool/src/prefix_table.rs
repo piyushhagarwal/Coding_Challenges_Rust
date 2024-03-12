@@ -49,7 +49,7 @@ mod tests {
         freq.insert('l', 42);
         freq.insert('m', 24);
         freq.insert('u', 37);
-        freq.insert('z', 2);
+        freq.insert('\n', 2);
         
         let root = generate_huffman_tree(&freq);
         let prefix_table = generate_prefix_table(&root);
@@ -61,6 +61,6 @@ mod tests {
         assert_eq!(prefix_table.get(&'l').unwrap(), "110");
         assert_eq!(prefix_table.get(&'m').unwrap(), "11111");
         assert_eq!(prefix_table.get(&'u').unwrap(), "100");
-        assert_eq!(prefix_table.get(&'z').unwrap(), "111100");
+        assert_eq!(prefix_table.get(&'\n').unwrap(), "111100");
     }
 }

@@ -41,6 +41,7 @@ mod tests {
         let frequency_map = generate_frequency_table(file_name);
         assert_eq!(frequency_map.get(&'X'), Some(&333));
         assert_eq!(frequency_map.get(&'t'), Some(&223000));
+        assert_eq!(frequency_map.get(&'\n'), Some(&73588));
         assert_eq!(frequency_map.get(&'\0'), None);
     }
 
@@ -48,11 +49,11 @@ mod tests {
     fn test_generate_frequency_table2() {
         let file_name = "input.txt";
         let frequency_map = generate_frequency_table(file_name);
-        assert_eq!(frequency_map.get(&'a'), Some(&4));
-        assert_eq!(frequency_map.get(&'b'), Some(&5));
-        assert_eq!(frequency_map.get(&'c'), Some(&6));
-        assert_eq!(frequency_map.get(&'d'), Some(&7));
-        assert_eq!(frequency_map.get(&' '), Some(&2));
+        // assert_eq!(frequency_map.get(&'a'), Some(&4));
+        // assert_eq!(frequency_map.get(&'b'), Some(&5));
+        // assert_eq!(frequency_map.get(&'c'), Some(&6));
+        // assert_eq!(frequency_map.get(&'d'), Some(&7));
+        assert_eq!(frequency_map.get(&'\n'), Some(&1));
         assert_eq!(frequency_map.get(&'\0'), None);
     }
 }

@@ -6,6 +6,7 @@ fn main() {
     let root = generate_huffman_tree(&frequency_table);
     let prefix_table = generate_prefix_table(&root);
 
-    encode_file(file_name, "header.bin","encoded_file.bin", root,  &prefix_table);
-    decode_file("header.bin", "encoded_file.bin", "decoded_file.txt");
+    encode_file(file_name, "encoded_file.bin", &prefix_table);
+    decode_file("encoded_file.bin", "decoded_file.txt").unwrap();
+    
 }

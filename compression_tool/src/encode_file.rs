@@ -6,51 +6,34 @@ use std::collections::{HashMap, VecDeque};
 
 use crate::huffman_binary_tree::Node;
 
-fn serialize_huffman_binary_tree(huffman_binary_tree: Option<Box<Node>>) -> String {
 
-    let mut result = String::new();
-    // Create queue to store the nodes of the huffman_binary_tree
+fn serialize_huffman_tree(root: &Option<Box<Node>>) -> String {
+    let mut serialized_tree = String::new();
     let mut queue = VecDeque::new();
-    queue.push_back(huffman_binary_tree);
-    
+    queue.push_back(root);
     while !queue.is_empty() {
         let node = queue.pop_front().unwrap();
-        match node {
-            Some(node) => {
-                result.push_str(&node.character.to_string());
-                result.push_str(" ");
-                queue.push_back(node.left_child);
-                queue.push_back(node.right_child);
-            },
-            None => {
-                result.push_str("null ");
-            }
+        
+        // If node is None, add a '~~,' to the serialized tree
+        if node.is_none() {
+            serialized_tree.push_str("~~,");
+        } else {
+            let node = node.unwrap();
+            serialized_tree.push_str(&node.character.to_string());
+            serialized_tree.push(',');
+            serialized_tree.push_str(&node.frequency.to_string());
+            serialized_tree.push(',');
+            queue.push_back(node.left_child.clone());
+            queue.push_back(node.right_child.clone());
         }
+        
+
     }
-
-    // Remove the last space character
-    result.pop();
+    serialized_tree
     
-    result
 }
 
-fn write_header_to_file(huffman_binary_tree: Box<Node>, output_header_file:&str){
-    // Serialize the huffman_binary_tree to a string    
-    let serialized_huffman_binary_tree = serialize_huffman_binary_tree(Some(huffman_binary_tree));
-
-    // Open the output file in append mode
-    let mut file = OpenOptions::new()
-        .write(true)
-        .append(true)  // Set append mode
-        .create(true)
-        .open(output_header_file)
-        .expect("Error opening the file");
-
-    // Write the serialized huffman_binary_tree to the output file
-    file.write_all(serialized_huffman_binary_tree.as_bytes()).expect("Error writing to file");
-}
-
-pub fn encode_file(input_file: &str, output_header_file:&str, output_file: &str, huffman_binary_tree: Box<Node>, prefix_table: &HashMap<char, String>) {
+pub fn encode_file(input_file: &str, output_file: &str, prefix_table: &HashMap<char, String>) {
     // Read the input file
     let mut file = File::open(input_file).expect("Error opening the file");
     let mut text = String::new();
@@ -88,7 +71,7 @@ pub fn encode_file(input_file: &str, output_header_file:&str, output_file: &str,
     }
 
     // Write the bytes to a text file (with .bin extension)
-    File::create(output_file).expect("Error creating file");
+    let mut file = File::create(output_file).expect("Error creating file");
 
     // Write the encoded text to the output file
     // Open the output file in append mode
@@ -99,9 +82,43 @@ pub fn encode_file(input_file: &str, output_header_file:&str, output_file: &str,
         .open(output_file)
         .expect("Error opening the file");
 
-    write_header_to_file(huffman_binary_tree, output_header_file);
-
+    write_header_to_file(prefix_table, output_file);
     file.write_all(&bytes).expect("Error writing to file");
 }
 
 
+// Unit tests
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use std::fs;
+
+//     #[test]
+//     fn test_encode_file() {
+//         let input_file = "input.txt";
+//         let output_file = "output.txt";
+//         let prefix_table = [('a', "0".to_string()), ('b', "10".to_string()), ('c', "110".to_string()), ('d', "111".to_string())];
+//         encode_file(input_file, output_file, &prefix_table);
+
+//         let expected_output = "0101101110";
+//         let output = fs::read_to_string(output_file).expect("Error reading the file");
+//         assert_eq!(output, expected_output);
+//     }
+// }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_write_header_to_file() {
+        let mut prefix_table = HashMap::new();
+        prefix_table.insert('a', "0".to_string());
+        prefix_table.insert('b', "10".to_string());
+        prefix_table.insert('c', "110".to_string());
+        prefix_table.insert('d', "111".to_string());
+
+        write_header_to_file(&prefix_table, "test_prefix_table.txt");
+    }
+}
