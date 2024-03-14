@@ -1,33 +1,48 @@
-use std::{
-    fs,
-    io::{prelude::*, BufReader},
-    net::{TcpListener, TcpStream},
-};
+use std::net::{TcpListener, TcpStream};
+use std::io::{BufReader, Read, Write};
 
-fn main() {
-    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+fn handle_client(mut client_stream: TcpStream) { 
+    println!("Received request from {}", client_stream.peer_addr().unwrap());
+    let mut buf_reader = BufReader::new(&mut client_stream); // Create a buffer reader to read the request
 
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
+    // Connect to the backend server
+    let mut backend_stream = TcpStream::connect("127.0.0.1:7878").expect("Failed to connect to backend server");
 
-        handle_connection(stream);
-    }
+    // Forward request to backend server
+    let mut request = String::new();
+    buf_reader
+        .read_to_string(&mut request)
+        .expect("Failed to read request");
+
+    backend_stream
+        .write_all(request.as_bytes())
+        .expect("Failed to forward request to backend server");
+
+    // Read response from backend server and forward it to the client
+    let mut response = String::new();
+    backend_stream
+        .read_to_string(&mut response)
+        .expect("Failed to read response from backend server");
+
+    client_stream 
+        .write_all(response.as_bytes())
+        .expect("Failed to forward response to client");
+
+    println!("Request processed successfully");
+    
 }
 
-fn handle_connection(mut stream: TcpStream) {
-    let buf_reader = BufReader::new(&mut stream);
-    let http_request: Vec<_> = buf_reader
-        .lines()
-        .map(|result| result.unwrap())
-        .take_while(|line| !line.is_empty())
-        .collect();
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:5000").unwrap();
 
-    let status_line = "HTTP/1.1 200 OK";
-    let contents = fs::read_to_string("hello.html").unwrap();
-    let length = contents.len();
-
-    let response =
-        format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
-
-    stream.write_all(response.as_bytes()).unwrap();
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                handle_client(stream);
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        }
+    }
 }
